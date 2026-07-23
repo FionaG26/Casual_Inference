@@ -7,7 +7,7 @@ library(tidyverse)
 library(psych)
 
 # Load cleaned data
-df <- readRDS("data/cleaned_cardio_data.rds")
+df <- readRDS("../data/cleaned_cardio_data.rds")
 
 # Global descriptive statistics
 cat("--- GLOBAL COHORT DESCRIPTIVES ---\n")
