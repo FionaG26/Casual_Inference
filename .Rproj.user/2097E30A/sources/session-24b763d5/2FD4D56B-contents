@@ -1,0 +1,57 @@
+# ==============================================================================
+# Script: 12_DAG.R
+# Objective: Define structural causal assumptions and calculate adjustment sets
+# ==============================================================================
+
+library(tidyverse)
+library(dagitty)
+library(ggdag)
+
+# 1. Define the Structural Causal Model using dagitty syntax
+cardio_dag <- dagitty('dag {
+  Active [pos="-2,2"]
+  Age [pos="-3,0"]
+  BMI [pos="-2,-2"]
+  Gender [pos="0,-3"]
+  A [exposure,pos="-4,0"]
+  Y [outcome,pos="4,0"]
+  ap_hi [pos="1,1"]
+  
+  Age -> A
+  Age -> Y
+  Age -> ap_hi
+  Gender -> A
+  Gender -> Y
+  BMI -> Y
+  BMI -> ap_hi
+  Active -> Y
+  A -> ap_hi
+  ap_hi -> Y
+  A -> Y
+}')
+
+# 2. Mathematically identify the correct Adjustment Set to block backdoor paths
+cat("--- MATHEMATICAL CAUSAL ADJUSTMENT SET ---\n")
+adjustment_set <- adjustmentSets(cardio_dag, effect = "total")
+print(adjustment_set)
+
+# 3. Generate and render the plot safely using standard ggplot structures
+cat("\nGenerating Figure 6: Causal Diagram Graph...\n")
+
+dag_plot <- ggdag(cardio_dag, text_col = "white") +
+  geom_dag_edges(edge_color = "#34495e") +
+  geom_dag_node(color = "#2c3e50") +
+  geom_dag_text(color = "white", fontface = "bold") +
+  theme_dag() +
+  theme(panel.background = element_rect(fill = "white", color = NA)) +
+  labs(
+    title = "Structural Causal Architecture for Cardiovascular Study",
+    subtitle = "Mapping Confounders vs. Blood Pressure Mediation Pathways"
+  )
+
+# Force the plot to print live to your RStudio Plots tab pane
+print(dag_plot)
+
+# Save the plot securely to your data folder using ggsave
+ggsave("data/figure6_causal_dag.png", plot = dag_plot, width = 7, height = 5, dpi = 300)
+cat("DAG visual graph successfully saved inside the 'data/' folder!\n")
